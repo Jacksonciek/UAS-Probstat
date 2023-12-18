@@ -11,6 +11,11 @@ gdp <- data$`gdp_per_capita`
 energy <- data$`Primary energy consumption per capita (kWh/person)`
 
 
+#View Data
+selected_data <- data.frame(Entity = data$Entity, Year = data$Year, GDP = gdp, Energy = energy)
+View(selected_data)
+
+
 #Function untuk menghitung modus
 modus <- function(x) {
   x <- na.omit(x) 
@@ -19,7 +24,7 @@ modus <- function(x) {
 }
 
 
-#Statistika Deskriptif Variabel Pertumbuhan GDP Per Kapita
+#Statistika Deskriptif Variabel GDP Per Kapita
 mean(gdp, na.rm = TRUE)
 median(gdp, na.rm = TRUE)
 modus(gdp)
@@ -28,13 +33,11 @@ sd(gdp, na.rm = TRUE)
 quantile(gdp, na.rm = TRUE)
 IQR(gdp, na.rm = TRUE)
 range(gdp, na.rm = TRUE)
-paste("Range: ", max(gdp, na.rm = TRUE)-
-        min(gdp, na.rm = TRUE))
+paste("Range: ", max(gdp, na.rm = TRUE)-min(gdp, na.rm = TRUE))
 summary(gdp)
 
 
-#Statistika Deskriptif Variabel Primary Energy
-#Consumption Per Capita
+#Statistika Deskriptif Variabel Primary Energy Consumption
 mean(energy, na.rm = TRUE)
 median(energy, na.rm = TRUE)
 modus(energy)
@@ -43,19 +46,17 @@ sd(energy, na.rm = TRUE)
 quantile(energy, na.rm = TRUE)
 IQR(energy, na.rm = TRUE)
 range(energy, na.rm = TRUE)
-paste("Range: ", max(energy, na.rm = TRUE)-
-        min(energy, na.rm = TRUE))
+paste("Range: ", max(energy, na.rm = TRUE)-min(energy, na.rm = TRUE))
 summary(energy)
 
 
 library(moments)
-#Skewness & Kurtosis Variabel Pertumbuhan GDP Per Kapita
+#Skewness & Kurtosis Variabel GDP Per Kapita
 skewness(gdp, na.rm = TRUE)
 kurtosis(gdp, na.rm = TRUE)
 
 
-#Skewness & Kurtosis Variabel Primary Energy
-#Consumption Per Capita
+#Skewness & Kurtosis Variabel Primary Energy Consumption
 skewness(energy, na.rm = TRUE)
 kurtosis(energy, na.rm = TRUE)
 
@@ -109,6 +110,8 @@ shapiro.test(energy)
 #Transformasi log
 gdp_log <- log10(gdp)
 energy_log <- log10(energy)
+inf_indices <- which(is.infinite(gdp_log))
+gdp_log[inf_indices] <- NA
 hist(gdp_log, main = "Histogram of GDP Per Kapita (Log Transformation)", xlim = c(2.5,5.0), ylim = c(0,60), col="steelblue")
 hist(energy_log, main = "Histogram of Primary Energy Consumption Per Kapita (Log Transformation)", xlim = c(2.5,5.5), ylim = c(0,100), col="steelblue")
 gdp_log_df <- data.frame(gdp_log)
@@ -154,6 +157,11 @@ result = predict(linearregretion, a)
 print(result)
 
 
+#Regression Line
+plot(gdp_log, energy_log, main = "Regression Line", xlab = "GDP", ylab = "Energy")
+abline(linearregretion, col = "steelblue") 
+
+
 #Residu
 residual = resid(linearregretion)
 print(residual)
@@ -173,3 +181,13 @@ qqline(residual)
 #Normalitas Residu
 plot(density(residual), col = "steelblue")
 shapiro.test(residual)
+
+
+#Chi Square
+chisquare <- matrix(c(0.5, 6.9, 8.4, 20.0, 98.4, 4.4, 20.3,6.7,11.0,10.5,4.7,13.5,0.8,1.5,7.9,9.6,67.6,14.9,26.4,28.9,41.6,43.4,52.1,0.5,5.3,6.7,23.1,84.4,3.7,14.3,4.4,9.7,9.0,3.8,12.7,1.0,1.6,8.4,9.0,81.8,19.3,23.4,28.4,48.2,47.0,54.7), nrow = 23, ncol=2)
+colnames(chisquare) <- c("2011-2015", "2016-2020")
+rownames(chisquare) <- c("Agriculture, fishing, mining and quarrying", "Manufacturing", "Electricity, gas and water supply, and waste management", "Construction", "Import and export trade", "Wholesale", "Retail trade", "Accommodation services", "Food and beverage services", "Land transport", "Water transport", "Air transport", "Warehousing and other transportation services", "Postal and courier services", "Telecommunications", "Other information and communications services", "Financing", "Insurance", "Real estate", "Professional and business services", "Public administration", "Social and personal services", "Ownership of premises") #Economic Activity
+View(chisquare)
+print(chisquare)
+chi_square_test <- chisq.test(chisquare)
+print(chi_square_test)
